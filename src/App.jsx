@@ -37,6 +37,7 @@ function App() {
     try {
       const clipboardText = await navigator.clipboard.readText();
       setText(clipboardText);
+      setError(null);
     } catch (error) {
       console.error("Failed to paste: ", error);
       setError("Failed to paste text. You can try pasting it manually.");
@@ -66,15 +67,17 @@ function App() {
       });
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.8-flash",
         contents:
           "Please provide a concise, one-sentence summary of the following text:\n\n" +
           text,
       });
 
-      const responseText = response.text;
-      console.log("AI Response: ", responseText);
-      setSummary(responseText);
+      if (response && response.text) {
+        setSummary(response.text);
+      } else {
+        throw new Error("No response text received from Gemini.");
+      }
     } catch (err) {
       console.error("Summarization failed: ", err);
       setError(err.message || "An error occurred while summarizing the text.");
@@ -187,14 +190,14 @@ function App() {
             {summary && <div className="divider"></div>}
             {summary && (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold">✅ Summary</h2>
                     <div
                       className="tooltip"
                       data-tip={`${summary.length} characters`}
                     >
-                      <div className="badge badge-sm sm:badge-lg  badge-ghost gap-2">
+                      <div className="badge badge-sm sm:badge-lg badge-ghost gap-2">
                         {countWords(summary)}{" "}
                         {pluralize(countWords(summary), "word", "words")} •{" "}
                         {countSentences(summary)}{" "}
@@ -208,7 +211,7 @@ function App() {
                   </div>
                   <button
                     onClick={copyToClipboard}
-                    className="btn btn-sm sm:btn-md btn-success gap-2"
+                    className="btn btn-sm sm:btn-md btn-success gap-2 w-full sm:w-auto"
                   >
                     {copied ? (
                       <>
@@ -222,9 +225,9 @@ function App() {
                   </button>
                 </div>
                 <div className="alert alert-success">
-                  <p className="text-lg w-full leading-relaxed whitespace-pre-wrap">
+                  <div className="text-lg w-full leading-relaxed whitespace-pre-wrap text-left">
                     {summary}
-                  </p>
+                  </div>
                 </div>
               </div>
             )}
