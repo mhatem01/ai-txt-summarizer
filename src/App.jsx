@@ -162,16 +162,16 @@ function App() {
   if (showTeamPage) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center p-4">
-        <div className="card bg-base-100 shadow-2xl max-w-3xl w-full p-8 rounded-2xl border border-purple-100">
+        <div className="card bg-base-100 shadow-2xl max-w-3xl w-full p-8 rounded-2xl border border-purple-200">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 flex items-center justify-center gap-2">
               <HiUsers className="text-purple-600" /> Project Engineering Team
             </h1>
-            <div className="bg-purple-50 p-4 rounded-xl max-w-md mx-auto text-left border border-purple-100/50">
-              <div className="flex items-center gap-2 text-purple-700 font-semibold mb-2">
+            <div className="bg-purple-900 p-5 rounded-xl max-w-md mx-auto text-left border border-purple-950 shadow-inner">
+              <div className="flex items-center gap-2 text-purple-200 font-bold mb-3">
                 <span className="text-base">🌐</span> Core Fields & Disciplines:
               </div>
-              <ul className="list-disc list-inside text-sm text-base-content/80 space-y-1 pl-2">
+              <ul className="list-disc list-inside text-sm text-purple-100 font-semibold space-y-2 pl-2">
                 <li>Engineering and Technology</li>
                 <li>Applied Mathematics and Artificial Intelligence</li>
                 <li>Computer and Data Science</li>
