@@ -1,11 +1,22 @@
+/* --------------------------------------------------------
+ * Core Backend Service
+ * Domain: Engineering and Technology
+ * Focus: Applied Mathematics and Artificial Intelligence
+ * Field: Computer and Data Science
+ * Created by: MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED 
+ *           & EBRAHIM MOHAMED EBRAHIM HAMADA RASAD
+ * -------------------------------------------------------- */
+
 import { GoogleGenAI } from "@google/genai";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoSparkles } from "react-icons/io5";
 import {
   HiClipboard,
   HiExclamationCircle,
   HiPencilAlt,
   HiCheck,
+  HiVolumeUp,
+  HiStop,
 } from "react-icons/hi";
 
 function App() {
@@ -14,6 +25,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   const countWords = (str) => {
     return str
@@ -57,6 +75,8 @@ function App() {
       return;
     }
 
+    handleStopSpeech();
+
     setLoading(true);
     setError(null);
     setSummary("");
@@ -97,7 +117,39 @@ function App() {
     }
   };
 
+  const handleSpeak = () => {
+    if (!summary) return;
+
+    if (isSpeaking) {
+      handleStopSpeech();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(summary);
+    utterance.lang = ""; 
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (event) => {
+      console.error("SpeechSynthesisUtterance error", event);
+      setIsSpeaking(false);
+    };
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleStopSpeech = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
+
   const clearAll = () => {
+    handleStopSpeech();
     setText("");
     setSummary("");
     setError(null);
@@ -209,20 +261,38 @@ function App() {
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={copyToClipboard}
-                    className="btn btn-sm sm:btn-md btn-success gap-2 w-full sm:w-auto"
-                  >
-                    {copied ? (
-                      <>
-                        <HiCheck className="w-5 h-5" /> Copied!
-                      </>
-                    ) : (
-                      <>
-                        <HiClipboard className="w-5 h-5" /> Copy
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={handleSpeak}
+                      className={`btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${
+                        isSpeaking ? "btn-warning" : "btn-neutral"
+                      }`}
+                    >
+                      {isSpeaking ? (
+                        <>
+                          <HiStop className="w-5 h-5" /> Stop Voice
+                        </>
+                      ) : (
+                        <>
+                          <HiVolumeUp className="w-5 h-5" /> Read Aloud
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={copyToClipboard}
+                      className="btn btn-sm sm:btn-md btn-success gap-2 flex-1 sm:flex-initial"
+                    >
+                      {copied ? (
+                        <>
+                          <HiCheck className="w-5 h-5" /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <HiClipboard className="w-5 h-5" /> Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div className="alert alert-success">
                   <div className="text-lg w-full leading-relaxed whitespace-pre-wrap text-left">
@@ -234,13 +304,3 @@ function App() {
           </div>
         </div>
         <div className="text-center mt-10">
-          <p className="text-base-content/60 font-medium">
-            Built with React, Tailwind CSS, Daisy UI, and Google Gemini API
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default App;
