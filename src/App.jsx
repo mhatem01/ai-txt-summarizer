@@ -165,7 +165,7 @@ function App() {
         <div className="card bg-base-100 shadow-2xl max-w-3xl w-full p-8 rounded-2xl border border-purple-200">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 flex items-center justify-center gap-2">
-              <HiUsers className="text-purple-600" /> Project Engineering Team
+              <HiUsers className="text-purple-600" /> The Ingenium Core Team
             </h1>
             <div className="bg-purple-900 p-5 rounded-xl max-w-md mx-auto text-left border border-purple-950 shadow-inner">
               <div className="flex items-center gap-2 text-purple-200 font-bold mb-3">
