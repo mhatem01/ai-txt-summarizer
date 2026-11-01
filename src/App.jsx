@@ -17,6 +17,8 @@ import {
   HiCheck,
   HiVolumeUp,
   HiStop,
+  HiUsers,
+  HiArrowLeft,
 } from "react-icons/hi";
 
 function App() {
@@ -26,6 +28,7 @@ function App() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showTeamPage, setShowTeamPage] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -156,6 +159,51 @@ function App() {
     setCopied(false);
   };
 
+  // عرض صفحة الفريق المنفصلة بناءً على اختيارك في الصورة الثانية
+  if (showTeamPage) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="card bg-white shadow-xl max-w-3xl w-full p-8 rounded-2xl border border-slate-100">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-slate-900 mb-4">Project Engineering Team</h1>
+            <div className="bg-slate-50 p-4 rounded-xl max-w-md mx-auto text-left border border-slate-100">
+              <div className="flex items-center gap-2 text-sky-600 font-semibold mb-2">
+                <span className="text-base">🌐</span> Core Fields & Disciplines:
+              </div>
+              <ul className="list-disc list-inside text-sm text-slate-600 space-y-1 pl-2">
+                <li>Engineering and Technology</li>
+                <li>Applied Mathematics and Artificial Intelligence</li>
+                <li>Computer and Data Science</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-4 my-8">
+            <div className="p-5 bg-white shadow-xs border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
+              <h2 className="font-bold text-blue-600 text-lg">MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED</h2>
+              <p className="text-sm text-slate-500 mt-1">Systems Architecture & Backend Security Core</p>
+            </div>
+            
+            <div className="p-5 bg-white shadow-xs border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
+              <h2 className="font-bold text-blue-600 text-lg">EBRAHIM MOHAMED EBRAHIM HAMADA RASAD</h2>
+              <p className="text-sm text-slate-500 mt-1">User Interface Integration & API Data Handlers</p>
+            </div>
+          </div>
+
+          <div className="text-center mt-6">
+            <button 
+              onClick={() => setShowTeamPage(false)} 
+              className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <HiArrowLeft className="w-4 h-4" /> Back to Summarizer App
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div
       data-theme="light"
@@ -164,8 +212,7 @@ function App() {
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
-            <IoSparkles className="text-purple-600 hidden sm:block" /> AI Text
-            Summarizer
+            <IoSparkles className="text-purple-600 hidden sm:block" /> AI Text Summarizer
           </h1>
           <p className="text-xl text-base-content/70 font-medium">
             Powered by Google Gemini AI
@@ -245,62 +292,73 @@ function App() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold">✅ Summary</h2>
-                    <div
-                      className="tooltip"
-                      data-tip={`${summary.length} characters`}
-                    >
-                      <div className="badge badge-sm sm:badge-lg badge-ghost gap-2">
-                        {countWords(summary)}{" "}
-                        {pluralize(countWords(summary), "word", "words")} •{" "}
-                        {countSentences(summary)}{" "}
-                        {pluralize(
-                          countSentences(summary),
-                          "sentence",
-                          "sentences"
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={handleSpeak}
-                      className={`btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${
-                        isSpeaking ? "btn-warning" : "btn-neutral"
-                      }`}
-                    >
-                      {isSpeaking ? (
-                        <>
-                          <HiStop className="w-5 h-5" /> Stop Voice
-                        </>
-                      ) : (
-                        <>
-                          <HiVolumeUp className="w-5 h-5" /> Read Aloud
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={copyToClipboard}
-                      className="btn btn-sm sm:btn-md btn-success gap-2 flex-1 sm:flex-initial"
-                    >
-                      {copied ? (
-                        <>
-                          <HiCheck className="w-5 h-5" /> Copied!
-                        </>
-                      ) : (
-                        <>
-                          <HiClipboard className="w-5 h-5" /> Copy
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div className="alert alert-success">
-                  <div className="text-lg w-full leading-relaxed whitespace-pre-wrap text-left">
-                    {summary}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="text-center mt-10">
+<div
+className="tooltip"
+data-tip={${summary.length} characters}
+>
+
+{countWords(summary)}{" "}
+{pluralize(countWords(summary), "word", "words")} •{" "}
+{countSentences(summary)}{" "}
+{pluralize(
+countSentences(summary),
+"sentence",
+"sentences"
+)}
+
+
+
+
+<button
+onClick={handleSpeak}
+className={btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${ isSpeaking ? "btn-warning" : "btn-neutral" }}
+>
+{isSpeaking ? (
+<>
+ Stop Voice
+</>
+) : (
+<>
+ Read Aloud
+</>
+)}
+
+
+{copied ? (
+<>
+ Copied!
+</>
+) : (
+<>
+ Copy
+</>
+)}
+
+
+
+
+
+{summary}
+
+
+
+)}
+
+
+
+
+Built with React, Tailwind CSS, Daisy UI, and Google Gemini API
+
+<button
+onClick={() => setShowTeamPage(true)}
+className="btn btn-outline btn-primary gap-2 btn-sm sm:btn-md shadow-md hover:scale-105 transition-transform"
+>
+
+View Project Team
+
+
+
+
+);
+}
+export default App;
