@@ -103,7 +103,7 @@ function App() {
       }
     } catch (err) {
       console.error("Summarization failed: ", err);
-      setError(err.message || "An error occurred while summarizing the text.");
+      setError(err.message || "AI servers are currently overloaded. Please wait a few seconds and try again.");
     } finally {
       setLoading(false);
     }
