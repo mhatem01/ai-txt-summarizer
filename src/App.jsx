@@ -169,7 +169,7 @@ function App() {
             </h1>
             <div className="bg-purple-900 p-5 rounded-xl max-w-md mx-auto text-left border border-purple-950 shadow-inner">
               <div className="flex items-center gap-2 text-purple-200 font-bold mb-3">
-                <span className="text-base">🌐</span> Core Fields & Disciplines:
+                <span className="text-base">🌐</span> Project Technical Foundation:
               </div>
               <ul className="list-disc list-inside text-sm text-purple-100 font-semibold space-y-2 pl-2">
                 <li>Engineering and Technology</li>
@@ -351,7 +351,7 @@ function App() {
         </div>
         <div className="text-center mt-10 flex flex-col items-center gap-4">
           <p className="text-base-content/60 font-medium">
-            Built with React, Tailwind CSS, Daisy UI, and Google Gemini API
+            © 2026 The Ingenium Core Team. All Rights Reserved.
           </p>
           <button 
             onClick={() => setShowTeamPage(true)}
