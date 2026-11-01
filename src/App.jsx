@@ -161,15 +161,17 @@ function App() {
 
   if (showTeamPage) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="card bg-white shadow-xl max-w-3xl w-full p-8 rounded-2xl border border-slate-100">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center p-4">
+        <div className="card bg-base-100 shadow-2xl max-w-3xl w-full p-8 rounded-2xl border border-purple-100">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Project Engineering Team</h1>
-            <div className="bg-slate-50 p-4 rounded-xl max-w-md mx-auto text-left border border-slate-100">
-              <div className="flex items-center gap-2 text-sky-600 font-semibold mb-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 flex items-center justify-center gap-2">
+              <HiUsers className="text-purple-600" /> Project Engineering Team
+            </h1>
+            <div className="bg-purple-50 p-4 rounded-xl max-w-md mx-auto text-left border border-purple-100/50">
+              <div className="flex items-center gap-2 text-purple-700 font-semibold mb-2">
                 <span className="text-base">🌐</span> Core Fields & Disciplines:
               </div>
-              <ul className="list-disc list-inside text-sm text-slate-600 space-y-1 pl-2">
+              <ul className="list-disc list-inside text-sm text-base-content/80 space-y-1 pl-2">
                 <li>Engineering and Technology</li>
                 <li>Applied Mathematics and Artificial Intelligence</li>
                 <li>Computer and Data Science</li>
@@ -178,21 +180,21 @@ function App() {
           </div>
 
           <div className="space-y-4 my-8">
-            <div className="p-5 bg-white shadow-sm border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
-              <h2 className="font-bold text-blue-600 text-lg">MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED</h2>
-              <p className="text-sm text-slate-500 mt-1">Systems Architecture & Backend Security Core</p>
+            <div className="p-5 bg-base-100 shadow-md border-l-4 border-purple-600 rounded-r-xl border border-base-200">
+              <h2 className="font-bold text-purple-600 text-lg">MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED</h2>
+              <p className="text-sm text-base-content/70 mt-1">Systems Architecture & Backend Security Core</p>
             </div>
             
-            <div className="p-5 bg-white shadow-sm border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
+            <div className="p-5 bg-base-100 shadow-md border-l-4 border-blue-600 rounded-r-xl border border-base-200">
               <h2 className="font-bold text-blue-600 text-lg">EBRAHIM MOHAMED EBRAHIM HAMADA RASAD</h2>
-              <p className="text-sm text-slate-500 mt-1">User Interface Integration & API Data Handlers</p>
+              <p className="text-sm text-base-content/70 mt-1">User Interface Integration & API Data Handlers</p>
             </div>
           </div>
 
           <div className="text-center mt-6">
             <button 
               onClick={() => setShowTeamPage(false)} 
-              className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors btn btn-ghost btn-sm"
             >
               <HiArrowLeft className="w-4 h-4" /> Back to Summarizer App
             </button>
