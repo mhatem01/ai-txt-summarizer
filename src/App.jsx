@@ -159,7 +159,6 @@ function App() {
     setCopied(false);
   };
 
-  // عرض صفحة الفريق المنفصلة بناءً على اختيارك في الصورة الثانية
   if (showTeamPage) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -179,12 +178,12 @@ function App() {
           </div>
 
           <div className="space-y-4 my-8">
-            <div className="p-5 bg-white shadow-xs border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
+            <div className="p-5 bg-white shadow-sm border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
               <h2 className="font-bold text-blue-600 text-lg">MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED</h2>
               <p className="text-sm text-slate-500 mt-1">Systems Architecture & Backend Security Core</p>
             </div>
             
-            <div className="p-5 bg-white shadow-xs border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
+            <div className="p-5 bg-white shadow-sm border-l-4 border-blue-600 rounded-r-xl border border-slate-100">
               <h2 className="font-bold text-blue-600 text-lg">EBRAHIM MOHAMED EBRAHIM HAMADA RASAD</h2>
               <p className="text-sm text-slate-500 mt-1">User Interface Integration & API Data Handlers</p>
             </div>
@@ -202,16 +201,14 @@ function App() {
       </div>
     );
   }
-
-
   return (
     <div
       data-theme="light"
-      className="min-h-screen bg-linear-to-br from-purple-100 via-blue-100 to-pink-100"
+      className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100"
     >
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
             <IoSparkles className="text-purple-600 hidden sm:block" /> AI Text Summarizer
           </h1>
           <p className="text-xl text-base-content/70 font-medium">
@@ -292,73 +289,79 @@ function App() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold">✅ Summary</h2>
-<div
-className="tooltip"
-data-tip={${summary.length} characters}
->
-
-{countWords(summary)}{" "}
-{pluralize(countWords(summary), "word", "words")} •{" "}
-{countSentences(summary)}{" "}
-{pluralize(
-countSentences(summary),
-"sentence",
-"sentences"
-)}
-
-
-
-
-<button
-onClick={handleSpeak}
-className={btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${ isSpeaking ? "btn-warning" : "btn-neutral" }}
->
-{isSpeaking ? (
-<>
- Stop Voice
-</>
-) : (
-<>
- Read Aloud
-</>
-)}
-
-
-{copied ? (
-<>
- Copied!
-</>
-) : (
-<>
- Copy
-</>
-)}
-
-
-
-
-
-{summary}
-
-
-
-)}
-
-
-
-
-Built with React, Tailwind CSS, Daisy UI, and Google Gemini API
-
-<button
-onClick={() => setShowTeamPage(true)}
-className="btn btn-outline btn-primary gap-2 btn-sm sm:btn-md shadow-md hover:scale-105 transition-transform"
->
-
-View Project Team
-
-
-
-
-);
+                    <div
+                      className="tooltip"
+                      data-tip={`${summary.length} characters`}
+                    >
+                      <div className="badge badge-sm sm:badge-lg badge-ghost gap-2">
+                        {countWords(summary)}{" "}
+                        {pluralize(countWords(summary), "word", "words")} •{" "}
+                        {countSentences(summary)}{" "}
+                        {pluralize(
+                          countSentences(summary),
+                          "sentence",
+                          "sentences"
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={handleSpeak}
+                      className={`btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${
+                        isSpeaking ? "btn-warning" : "btn-neutral"
+                      }`}
+                    >
+                      {isSpeaking ? (
+                        <>
+                          <HiStop className="w-5 h-5" /> Stop Voice
+                        </>
+                      ) : (
+                        <>
+                          <HiVolumeUp className="w-5 h-5" /> Read Aloud
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={copyToClipboard}
+                      className="btn btn-sm sm:btn-md btn-success gap-2 flex-1 sm:flex-initial"
+                    >
+                      {copied ? (
+                        <>
+                          <HiCheck className="w-5 h-5" /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <HiClipboard className="w-5 h-5" /> Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="alert alert-success">
+                  <div className="text-lg w-full leading-relaxed whitespace-pre-wrap text-left">
+                    {summary}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="text-center mt-10 flex flex-col items-center gap-4">
+          <p className="text-base-content/60 font-medium">
+            Built with React, Tailwind CSS, Daisy UI, and Google Gemini API
+          </p>
+          <button 
+            onClick={() => setShowTeamPage(true)}
+            className="btn btn-outline btn-primary gap-2 btn-sm sm:btn-md shadow-md hover:scale-105 transition-transform"
+          >
+            <HiUsers className="w-5 h-5" />
+            View Project Team
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
+
 export default App;
