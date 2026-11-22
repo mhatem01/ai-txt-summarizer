@@ -88,20 +88,27 @@ function App() {
       apiKey: import.meta.env.VITE_GEMINI_API_KEY,
     });
 
-    const models = ["gemini-3.8-flash", "gemini-3.8-flash-lite", "gemini-3.5-flash"];
+    const models = ["gemini-3.8-flash-lite", "gemini-3.8-flash"];
     let success = false;
 
     for (const modelName of models) {
       try {
-        const response = await ai.models.generateContent({
+        const responseStream = await ai.models.generateContentStream({
           model: modelName,
           contents:
-            "Please provide a concise, one-sentence summary of the following text:\n\n" +
+            "Provide a concise, one-sentence summary of the following text:\n\n" +
             text,
         });
 
-        if (response && response.text) {
-          setSummary(response.text);
+        let fullText = "";
+        for await (const chunk of responseStream) {
+          if (chunk.text) {
+            fullText += chunk.text;
+            setSummary(fullText);
+          }
+        }
+
+        if (fullText.trim()) {
           success = true;
           break;
         }
