@@ -88,7 +88,7 @@ function App() {
       apiKey: import.meta.env.VITE_GEMINI_API_KEY,
     });
 
-    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    const models = ["gemini-3.8-flash", "gemini-3.8-flash-lite", "gemini-3.5-flash"];
     let success = false;
 
     for (const modelName of models) {
@@ -111,13 +111,13 @@ function App() {
         if (
           errMsg.includes("503") ||
           errMsg.includes("UNAVAILABLE") ||
-          errMsg.includes("429")
+          errMsg.includes("429") ||
+          errMsg.includes("404") ||
+          errMsg.includes("NOT_FOUND")
         ) {
           continue;
         } else {
-          setError(
-            "Unable to connect to the AI service. Please check your connection and try again."
-          );
+          setError(`AI Service Error: ${errMsg}`);
           setLoading(false);
           return;
         }
