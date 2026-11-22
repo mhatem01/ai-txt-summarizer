@@ -84,29 +84,53 @@ function App() {
     setError(null);
     setSummary("");
 
-    try {
-      const ai = new GoogleGenAI({
-        apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-      });
+    const ai = new GoogleGenAI({
+      apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+    });
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents:
-          "Please provide a concise, one-sentence summary of the following text:\n\n" +
-          text,
-      });
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    let success = false;
 
-      if (response && response.text) {
-        setSummary(response.text);
-      } else {
-        throw new Error("No response text received from Gemini.");
+    for (const modelName of models) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents:
+            "Please provide a concise, one-sentence summary of the following text:\n\n" +
+            text,
+        });
+
+        if (response && response.text) {
+          setSummary(response.text);
+          success = true;
+          break;
+        }
+      } catch (err) {
+        console.warn(`Model ${modelName} failed, trying fallback...`, err);
+        const errMsg = err?.message || "";
+        if (
+          errMsg.includes("503") ||
+          errMsg.includes("UNAVAILABLE") ||
+          errMsg.includes("429")
+        ) {
+          continue;
+        } else {
+          setError(
+            "Unable to connect to the AI service. Please check your connection and try again."
+          );
+          setLoading(false);
+          return;
+        }
       }
-    } catch (err) {
-      console.error("Summarization failed: ", err);
-      setError(err.message || "AI servers are currently overloaded. Please wait a few seconds and try again.");
-    } finally {
-      setLoading(false);
     }
+
+    if (!success) {
+      setError(
+        "AI servers are currently experiencing high traffic. Please wait a few seconds and click Summarize again."
+      );
+    }
+
+    setLoading(false);
   };
 
   const copyToClipboard = async () => {
@@ -131,7 +155,7 @@ function App() {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(summary);
-    utterance.lang = ""; 
+    utterance.lang = "en-US";
 
     utterance.onend = () => {
       setIsSpeaking(false);
