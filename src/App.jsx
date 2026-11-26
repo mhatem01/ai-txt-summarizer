@@ -33,7 +33,9 @@ function App() {
 
   useEffect(() => {
     return () => {
-      window.speechSynthesis.cancel();
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
@@ -81,7 +83,7 @@ function App() {
       return;
     }
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY?.trim();
     if (!apiKey) {
       setError(
         "API Key is missing! Please add VITE_GEMINI_API_KEY in your environment variables."
@@ -90,65 +92,51 @@ function App() {
     }
 
     handleStopSpeech();
-
     setLoading(true);
     setError(null);
     setSummary("");
 
-    const ai = new GoogleGenAI({ apiKey });
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const models = [
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+      ];
+      let success = false;
+      let lastErrorMsg = "";
 
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
-    let success = false;
+      const promptInstruction = isArabic(text)
+        ? "لخّص النص التالي بأسلوب واضح ومختصر باللغة العربية:\n\n"
+        : "Provide a concise, clear summary of the following text:\n\n";
 
-    const promptInstruction = isArabic(text)
-      ? "لخّص النص التالي بأسلوب واضح ومختصر باللغة العربية:\n\n"
-      : "Provide a concise, clear summary of the following text:\n\n";
+      for (const modelName of models) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelName,
+            contents: promptInstruction + text,
+          });
 
-    for (const modelName of models) {
-      try {
-        const responseStream = await ai.models.generateContentStream({
-          model: modelName,
-          contents: promptInstruction + text,
-        });
-
-        let fullText = "";
-        for await (const chunk of responseStream) {
-          if (chunk.text) {
-            fullText += chunk.text;
-            setSummary(fullText);
+          if (response && response.text) {
+            setSummary(response.text.trim());
+            success = true;
+            break;
           }
-        }
-
-        if (fullText.trim()) {
-          success = true;
-          break;
-        }
-      } catch (err) {
-        console.warn(`Model ${modelName} failed, trying fallback...`, err);
-        const errMsg = err?.message || "";
-        if (
-          errMsg.includes("503") ||
-          errMsg.includes("UNAVAILABLE") ||
-          errMsg.includes("429") ||
-          errMsg.includes("404") ||
-          errMsg.includes("NOT_FOUND")
-        ) {
-          continue;
-        } else {
-          setError(`AI Service Error: ${errMsg}`);
-          setLoading(false);
-          return;
+        } catch (err) {
+          console.error(`Error with ${modelName}:`, err);
+          lastErrorMsg = err?.message || JSON.stringify(err);
         }
       }
-    }
 
-    if (!success) {
-      setError(
-        "AI servers are currently busy or API key is invalid. Please try again in a few seconds."
-      );
+      if (!success) {
+        setError(`Google API Error: ${lastErrorMsg}`);
+      }
+    } catch (globalErr) {
+      setError(`Connection Error: ${globalErr.message}`);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const copyToClipboard = async () => {
@@ -163,7 +151,7 @@ function App() {
   };
 
   const handleSpeak = () => {
-    if (!summary) return;
+    if (!summary || !("speechSynthesis" in window)) return;
 
     if (isSpeaking) {
       handleStopSpeech();
@@ -189,7 +177,9 @@ function App() {
   };
 
   const handleStopSpeech = () => {
-    window.speechSynthesis.cancel();
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     setIsSpeaking(false);
   };
 
