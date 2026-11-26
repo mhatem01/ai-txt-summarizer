@@ -99,13 +99,13 @@ function App() {
     try {
       const ai = new GoogleGenAI({ apiKey });
       const models = [
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-3.5-flash",
+        "gemini-4-hydrogen",
       ];
       let success = false;
-      let lastErrorMsg = "";
+      let errorsList = [];
 
       const promptInstruction = isArabic(text)
         ? "لخّص النص التالي بأسلوب واضح ومختصر باللغة العربية:\n\n"
@@ -125,12 +125,12 @@ function App() {
           }
         } catch (err) {
           console.error(`Error with ${modelName}:`, err);
-          lastErrorMsg = err?.message || JSON.stringify(err);
+          errorsList.push(`${modelName}: ${err?.message || "Failed"}`);
         }
       }
 
       if (!success) {
-        setError(`Google API Error: ${lastErrorMsg}`);
+        setError(`Google API Error -> ${errorsList[0] || "Unknown error"}`);
       }
     } catch (globalErr) {
       setError(`Connection Error: ${globalErr.message}`);
