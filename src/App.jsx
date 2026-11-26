@@ -1,5 +1,5 @@
 /* --------------------------------------------------------
- * Core Backend Service
+ * Core Frontend Service
  * Domain: Engineering and Technology
  * Focus: Applied Mathematics and Artificial Intelligence
  * Field: Computer and Data Science
@@ -19,6 +19,7 @@ import {
   HiStop,
   HiUsers,
   HiArrowLeft,
+  HiTrash,
 } from "react-icons/hi";
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
     };
   }, []);
 
+  const isArabic = (str) => /[\u0600-\u06FF]/.test(str);
+
   const countWords = (str) => {
     return str
       .trim()
@@ -46,7 +49,7 @@ function App() {
   const countSentences = (str) => {
     return str
       .trim()
-      .split(/[.!?]+/)
+      .split(/[.!?؟]+/)
       .filter((sentence) => sentence.trim().length > 0).length;
   };
 
@@ -59,9 +62,9 @@ function App() {
       const clipboardText = await navigator.clipboard.readText();
       setText(clipboardText);
       setError(null);
-    } catch (error) {
-      console.error("Failed to paste: ", error);
-      setError("Failed to paste text. You can try pasting it manually.");
+    } catch (err) {
+      console.error("Failed to paste: ", err);
+      setError("Failed to paste text. Please paste it manually using Ctrl+V.");
     }
   };
 
@@ -78,26 +81,34 @@ function App() {
       return;
     }
 
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      setError(
+        "API Key is missing! Please add VITE_GEMINI_API_KEY in your environment variables."
+      );
+      return;
+    }
+
     handleStopSpeech();
 
     setLoading(true);
     setError(null);
     setSummary("");
 
-    const ai = new GoogleGenAI({
-      apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-    });
+    const ai = new GoogleGenAI({ apiKey });
 
-    const models = ["gemini-3.8-flash-lite", "gemini-3.8-flash"];
+    const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
     let success = false;
+
+    const promptInstruction = isArabic(text)
+      ? "لخّص النص التالي بأسلوب واضح ومختصر باللغة العربية:\n\n"
+      : "Provide a concise, clear summary of the following text:\n\n";
 
     for (const modelName of models) {
       try {
         const responseStream = await ai.models.generateContentStream({
           model: modelName,
-          contents:
-            "Provide a concise, one-sentence summary of the following text:\n\n" +
-            text,
+          contents: promptInstruction + text,
         });
 
         let fullText = "";
@@ -133,7 +144,7 @@ function App() {
 
     if (!success) {
       setError(
-        "AI servers are currently experiencing high traffic. Please wait a few seconds and click Summarize again."
+        "AI servers are currently busy or API key is invalid. Please try again in a few seconds."
       );
     }
 
@@ -145,8 +156,8 @@ function App() {
       await navigator.clipboard.writeText(summary);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error("Failed to copy: ", error);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
       setError("Failed to copy to clipboard. Please try again.");
     }
   };
@@ -162,7 +173,7 @@ function App() {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(summary);
-    utterance.lang = "en-US";
+    utterance.lang = isArabic(summary) ? "ar-SA" : "en-US";
 
     utterance.onend = () => {
       setIsSpeaking(false);
@@ -192,7 +203,10 @@ function App() {
 
   if (showTeamPage) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center p-4">
+      <div
+        data-theme="light"
+        className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center p-4"
+      >
         <div className="card bg-base-100 shadow-2xl max-w-3xl w-full p-8 rounded-2xl border border-purple-200">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 flex items-center justify-center gap-2">
@@ -212,19 +226,27 @@ function App() {
 
           <div className="space-y-4 my-8">
             <div className="p-5 bg-base-100 shadow-md border-l-4 border-purple-600 rounded-r-xl border border-base-200">
-              <h2 className="font-bold text-purple-600 text-lg">MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED</h2>
-              <p className="text-sm text-base-content/70 mt-1">Systems Architecture & Backend Security Core</p>
+              <h2 className="font-bold text-purple-600 text-lg">
+                MOHAMED HATEM MOHAMED ABDELAZIZ MOHAMED
+              </h2>
+              <p className="text-sm text-base-content/70 mt-1">
+                Systems Architecture & Backend Security Core
+              </p>
             </div>
-            
+
             <div className="p-5 bg-base-100 shadow-md border-l-4 border-blue-600 rounded-r-xl border border-base-200">
-              <h2 className="font-bold text-blue-600 text-lg">EBRAHIM MOHAMED EBRAHIM HAMADA RASAD</h2>
-              <p className="text-sm text-base-content/70 mt-1">User Interface Integration & API Data Handlers</p>
+              <h2 className="font-bold text-blue-600 text-lg">
+                EBRAHIM MOHAMED EBRAHIM HAMADA RASAD
+              </h2>
+              <p className="text-sm text-base-content/70 mt-1">
+                User Interface Integration & API Data Handlers
+              </p>
             </div>
           </div>
 
           <div className="text-center mt-6">
-            <button 
-              onClick={() => setShowTeamPage(false)} 
+            <button
+              onClick={() => setShowTeamPage(false)}
               className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors btn btn-ghost btn-sm"
             >
               <HiArrowLeft className="w-4 h-4" /> Back to Summarizer App
@@ -234,6 +256,7 @@ function App() {
       </div>
     );
   }
+
   return (
     <div
       data-theme="light"
@@ -248,149 +271,136 @@ function App() {
             Powered by Google Gemini AI
           </p>
         </div>
+
         <div className="card bg-base-100 shadow-2xl max-w-5xl mx-auto">
-          <div className="card-body p-8">
+          <div className="card-body p-6 md:p-8">
             <div className="mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
-                <label className="text-lg font-semibold">
-                  📝 Enter your text
+                <label className="text-lg font-bold flex items-center gap-2 text-base-content">
+                  <HiPencilAlt className="text-purple-600 w-5 h-5" /> Enter Your Text
                 </label>
-                <div className="flex items-center gap-3">
-                  <div
-                    className="tooltip"
-                    data-tip={`${text.length} characters`}
-                  >
-                    <div className="badge badge-sm sm:badge-lg badge-ghost gap-2">
-                      {countWords(text)}{" "}
-                      {pluralize(countWords(text), "word", "words")} •{" "}
-                      {countSentences(text)}{" "}
-                      {pluralize(countSentences(text), "sentence", "sentences")}
-                    </div>
-                  </div>
+                <div className="flex gap-2">
                   <button
                     onClick={pasteText}
-                    className="btn btn-sm btn-primary gap-2"
-                    disabled={loading}
+                    className="btn btn-sm btn-outline btn-primary gap-1"
                   >
-                    <HiClipboard className="w-4 h-4" />
-                    Paste
+                    <HiClipboard className="w-4 h-4" /> Paste Text
                   </button>
+                  {text && (
+                    <button
+                      onClick={clearAll}
+                      className="btn btn-sm btn-outline btn-error gap-1"
+                    >
+                      <HiTrash className="w-4 h-4" /> Clear
+                    </button>
+                  )}
                 </div>
               </div>
+
               <textarea
-                className="textarea textarea-primary w-full h-56 text-base"
-                placeholder="Paste your article, blog post, or any long text here..."
+                className="textarea textarea-bordered w-full h-48 text-base focus:outline-none focus:border-purple-500"
+                placeholder="Paste or type your long article, essay, or notes here (at least 50 characters)..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+                dir="auto"
               ></textarea>
+
+              <div className="flex justify-between text-xs text-base-content/60 mt-2 font-medium">
+                <span>
+                  {countWords(text)} {pluralize(countWords(text), "word", "words")} ·{" "}
+                  {countSentences(text)}{" "}
+                  {pluralize(countSentences(text), "sentence", "sentences")}
+                </span>
+                <span>{text.length} characters</span>
+              </div>
             </div>
+
             {error && (
-              <div className="alert alert-error mb-6">
-                <HiExclamationCircle className="w-6 h-6" />
+              <div className="alert alert-error mb-6 shadow-md">
+                <HiExclamationCircle className="w-6 h-6 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
-            <div className="flex justify-end gap-3 mb-6">
-              <button
-                className="btn btn-secondary"
-                onClick={clearAll}
-                disabled={loading}
-              >
-                Clear
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={summarizeText}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="loading loading-spinner"></span>
-                    Summarizing...
-                  </>
-                ) : (
-                  <>
-                    <HiPencilAlt className="w-5 h-5" />
-                    Summarize
-                  </>
-                )}
-              </button>
-            </div>
-            {summary && <div className="divider"></div>}
+
+            <button
+              onClick={summarizeText}
+              disabled={loading || !text.trim()}
+              className="btn btn-primary w-full text-lg bg-gradient-to-r from-purple-600 to-blue-600 border-none hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+            >
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner loading-md"></span>
+                  Summarizing...
+                </>
+              ) : (
+                <>
+                  <IoSparkles className="w-5 h-5" /> Summarize Text
+                </>
+              )}
+            </button>
+
             {summary && (
-              <div>
+              <div className="mt-8 p-6 bg-purple-50 rounded-xl border border-purple-200 shadow-inner">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-bold">✅ Summary</h2>
-                    <div
-                      className="tooltip"
-                      data-tip={`${summary.length} characters`}
-                    >
-                      <div className="badge badge-sm sm:badge-lg badge-ghost gap-2">
-                        {countWords(summary)}{" "}
-                        {pluralize(countWords(summary), "word", "words")} •{" "}
-                        {countSentences(summary)}{" "}
-                        {pluralize(
-                          countSentences(summary),
-                          "sentence",
-                          "sentences"
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <h2 className="text-xl font-bold text-purple-900 flex items-center gap-2">
+                    <IoSparkles className="text-purple-600" /> AI Summary
+                  </h2>
+                  <div className="flex gap-2">
                     <button
                       onClick={handleSpeak}
-                      className={`btn btn-sm sm:btn-md gap-2 flex-1 sm:flex-initial ${
-                        isSpeaking ? "btn-warning" : "btn-neutral"
-                      }`}
+                      className={`btn btn-sm ${
+                        isSpeaking ? "btn-error" : "btn-secondary"
+                      } gap-1`}
                     >
                       {isSpeaking ? (
                         <>
-                          <HiStop className="w-5 h-5" /> Stop Voice
+                          <HiStop className="w-4 h-4" /> Stop Audio
                         </>
                       ) : (
                         <>
-                          <HiVolumeUp className="w-5 h-5" /> Read Aloud
+                          <HiVolumeUp className="w-4 h-4" /> Listen
                         </>
                       )}
                     </button>
+
                     <button
                       onClick={copyToClipboard}
-                      className="btn btn-sm sm:btn-md btn-success gap-2 flex-1 sm:flex-initial"
+                      className="btn btn-sm btn-outline btn-primary gap-1"
                     >
                       {copied ? (
                         <>
-                          <HiCheck className="w-5 h-5" /> Copied!
+                          <HiCheck className="w-4 h-4 text-success" /> Copied!
                         </>
                       ) : (
                         <>
-                          <HiClipboard className="w-5 h-5" /> Copy
+                          <HiClipboard className="w-4 h-4" /> Copy
                         </>
                       )}
                     </button>
                   </div>
                 </div>
-                <div className="alert alert-success">
-                  <div className="text-lg w-full leading-relaxed whitespace-pre-wrap text-left">
-                    {summary}
-                  </div>
-                </div>
+
+                <p
+                  className="text-base-content text-lg leading-relaxed whitespace-pre-line"
+                  dir="auto"
+                >
+                  {summary}
+                </p>
               </div>
             )}
+
+            <div className="mt-10 pt-6 border-t border-base-200 text-center">
+              <button
+                onClick={() => setShowTeamPage(true)}
+                className="btn btn-outline btn-accent btn-sm gap-2"
+              >
+                <HiUsers className="w-4 h-4" /> View Project Team & Details
+              </button>
+              <p className="text-xs text-base-content/50 mt-3">
+                All Rights Reserved © Team #01 - CS Division 2026
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="text-center mt-10 flex flex-col items-center gap-4">
-          <p className="text-base-content/60 font-medium">
-            © 2026 The Ingenium Core Team. All Rights Reserved.
-          </p>
-          <button 
-            onClick={() => setShowTeamPage(true)}
-            className="btn btn-outline btn-primary gap-2 btn-sm sm:btn-md shadow-md hover:scale-105 transition-transform"
-          >
-            <HiUsers className="w-5 h-5" />
-            View Project Team
-          </button>
         </div>
       </div>
     </div>
