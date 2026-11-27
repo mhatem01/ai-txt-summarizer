@@ -387,7 +387,7 @@ function App() {
                 <HiUsers className="w-4 h-4" /> View Project Team & Details
               </button>
               <p className="text-xs text-base-content/50 mt-3">
-                All Rights Reserved © The Ingenium Core Team
+                All Rights Reserved © The Ingenium Core Team 2026
               </p>
             </div>
           </div>
